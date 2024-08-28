@@ -72,8 +72,11 @@ void createColorPointcloudFromLayer(
     // Iterate over all voxels in said blocks.
     const Block<VoxelType>& block = layer.getBlockByIndex(index);
 
-    for (size_t linear_index = 0; linear_index < num_voxels_per_block;
-         ++linear_index) {
+    for (size_t linear_index = 0; linear_index < num_voxels_per_block; ++linear_index) {
+      // get 6 neighbor index
+      
+
+
       Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
       if (vis_function(block.getVoxelByLinearIndex(linear_index), coord,
                        &color)) {

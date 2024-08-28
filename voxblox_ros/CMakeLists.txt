@@ -4,7 +4,10 @@ project(voxblox_ros)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-add_definitions(-std=c++14 -Wall -Wextra)
+find_package(OpenMP REQUIRED)
+
+include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+add_definitions(-std=c++14 -Wall -Wextra -fopenmp)
 
 #############
 # LIBRARIES #
@@ -30,7 +33,7 @@ target_link_libraries(voxblox_eval ${PROJECT_NAME})
 cs_add_executable(tsdf_server
   src/tsdf_server_node.cc
 )
-target_link_libraries(tsdf_server ${PROJECT_NAME})
+target_link_libraries(tsdf_server ${PROJECT_NAME} ${OpenMP_CXX_LIBRARIES})
 
 cs_add_executable(esdf_server
   src/esdf_server_node.cc

@@ -24,6 +24,7 @@
 #include <voxblox/mesh/mesh_integrator.h>
 #include <voxblox/utils/color_maps.h>
 #include <voxblox_msgs/FilePath.h>
+#include <voxblox_msgs/QueryTSDF.h>
 #include <voxblox_msgs/Mesh.h>
 
 #include "voxblox_ros/mesh_vis.h"
@@ -85,8 +86,10 @@ class TsdfServer {
                        voxblox_msgs::FilePath::Response& response);  // NOLINT
   bool loadMapCallback(voxblox_msgs::FilePath::Request& request,     // NOLINT
                        voxblox_msgs::FilePath::Response& response);  // NOLINT
-  bool generateMeshCallback(std_srvs::Empty::Request& request,       // NOLINT
-                            std_srvs::Empty::Response& response);    // NOLINT
+  bool generateMeshCallback(voxblox_msgs::FilePath::Request& request,       // NOLINT
+                            voxblox_msgs::FilePath::Response& response);    // NOLINT
+  bool queryTSDFCallback(voxblox_msgs::QueryTSDF::Request& request,       // NOLINT
+                            voxblox_msgs::QueryTSDF::Response& response);    // NOLINT
   bool publishPointcloudsCallback(
       std_srvs::Empty::Request& request,                             // NOLINT
       std_srvs::Empty::Response& response);                          // NOLINT
@@ -156,6 +159,7 @@ class TsdfServer {
   ros::ServiceServer load_map_srv_;
   ros::ServiceServer publish_pointclouds_srv_;
   ros::ServiceServer publish_tsdf_map_srv_;
+  ros::ServiceServer query_tsdf_srv_;
 
   /// Tools for broadcasting TFs.
   tf::TransformBroadcaster tf_broadcaster_;

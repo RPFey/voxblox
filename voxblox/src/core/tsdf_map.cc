@@ -96,6 +96,24 @@ bool TsdfMap::getWeightAtPosition(const Eigen::Vector3d& position,
   return success;
 }
 
+bool TsdfMap::getDistanceAtPosition(const Eigen::Vector3d& position,
+                                  double* distance) const {
+  constexpr bool interpolate = false;
+  return getDistanceAtPosition(position, interpolate, distance);
+}
+
+bool TsdfMap::getDistanceAtPosition(const Eigen::Vector3d& position,
+                                  const bool interpolate,
+                                  double* distance) const {
+  FloatingPoint distance_fp;
+  bool success = interpolator_.getDistance(position.cast<FloatingPoint>(),
+                                         &distance_fp, interpolate);
+  if (success) {
+    *distance = static_cast<double>(distance_fp);
+  }
+  return success;
+}
+
 std::string TsdfMap::Config::print() const {
   std::stringstream ss;
   // clang-format off

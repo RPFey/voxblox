@@ -125,6 +125,8 @@ TsdfServer::TsdfServer(const ros::NodeHandle& nh,
       "publish_pointclouds", &TsdfServer::publishPointcloudsCallback, this);
   publish_tsdf_map_srv_ = nh_private_.advertiseService(
       "publish_map", &TsdfServer::publishTsdfMapCallback, this);
+  query_tsdf_srv_ = nh_private_.advertiseService(
+      "query_tsdf", &TsdfServer::queryTSDFCallback, this);  
 
   // If set, use a timer to progressively integrate the mesh.
   double update_mesh_every_n_sec = 1.0;
@@ -146,6 +148,23 @@ TsdfServer::TsdfServer(const ros::NodeHandle& nh,
         nh_private_.createTimer(ros::Duration(publish_map_every_n_sec),
                                 &TsdfServer::publishMapEvent, this);
   }
+}
+
+// Query TSDF at given point
+bool TsdfServer::queryTSDFCallback(voxblox_msgs::QueryTSDF::Request& request,       
+                            voxblox_msgs::QueryTSDF::Response& response){
+
+    int num_points = request.points.size();
+    response.tsdf.resize(num_points);
+
+    #pragma omp parallel for num_threads(8) shared(response, request) 
+    for(int i = 0; i < num_points; i++){
+        Eigen::Vector3d position = Eigen::Vector3d(request.points[i].x, request.points[i].y, request.points[i].z);
+        double distance = 0.;
+        tsdf_map_->getDistanceAtPosition(position, &distance);
+        response.tsdf[i] = distance;
+    }
+    return true;
 }
 
 void TsdfServer::getServerConfigFromRosParam(
@@ -584,9 +603,10 @@ bool TsdfServer::clearMapCallback(std_srvs::Empty::Request& /*request*/,
   return true;
 }
 
-bool TsdfServer::generateMeshCallback(std_srvs::Empty::Request& /*request*/,
-                                      std_srvs::Empty::Response&
+bool TsdfServer::generateMeshCallback(voxblox_msgs::FilePath::Request& request/*request*/,
+                                      voxblox_msgs::FilePath::Response& response
                                       /*response*/) {  // NOLINT
+  mesh_filename_ = request.file_path;
   return generateMesh();
 }
 
